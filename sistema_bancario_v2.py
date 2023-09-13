@@ -4,6 +4,8 @@ def menu():
 [d] Depositar
 [s] Sacar
 [e] Extrato
+[u] Criar usuario
+[c] Criar conta corrente
 [q] Sair
 
 => """
@@ -53,12 +55,66 @@ def sacar(*, saldo, valor, extrato, limite, numero_saques, limite_saques):
     return saldo, extrato
 
 
+def filtrar_usuario(cpf, usuarios):
+    for usuario in usuarios:
+        if cpf == usuario["cpf"]:
+            return usuario
+
+        return None
+
+
+def criar_usuario(usuarios):
+    cpf = input("Informe o CPF (somente numeros): ")
+
+    usuario = filtrar_usuario(cpf, usuarios)
+    if usuario:
+        print("Usuário já existe!")
+        return
+
+    nome = input("Informe o nome completo: ")
+    data_nascimento = input("Informe a data de nascimento (dd-mm-aaaa): ")
+    endereco = input(
+        "Informe o endereço (logradouro, nro - bairro - cidade/sigla estado): "
+    )
+
+    usuarios.append(
+        {
+            "cpf": cpf,
+            "nome": nome,
+            "data_nascimento": data_nascimento,
+            "endereco": endereco,
+        }
+    )
+    print("Usuário criado com sucesso!")
+    return
+
+
+def criar_conta_corrente(agencia, numero_conta, usuarios):
+    cpf = input("Informe o CPF (somente numeros): ")
+
+    usuario = filtrar_usuario(cpf, usuarios)
+    if not usuario:
+        print("Usuário não existe!")
+        return
+    else:
+        print("Conta corrente criada com sucesso!")
+        return {
+            "agencia": agencia,
+            "numero_conta": numero_conta,
+            "usuario": usuario,
+        }
+
+
 def main():
     saldo = 0
     limite = 500
     extrato = ""
     numero_saques = 0
     LIMITE_SAQUES = 3
+    AGENCIA = "0001"
+    usuarios = []
+    contas_corrente = []
+    numero_conta = 1
 
     while True:
         opcao = input(menu())
@@ -80,6 +136,15 @@ def main():
 
         elif opcao == "e":
             exibir_extrato(saldo, extrato=extrato)
+
+        elif opcao == "u":
+            criar_usuario(usuarios)
+
+        elif opcao == "c":
+            conta = criar_conta_corrente(AGENCIA, numero_conta, usuarios)
+            if conta:
+                contas_corrente.append(conta)
+                numero_conta += 1
 
         elif opcao == "q":
             break
